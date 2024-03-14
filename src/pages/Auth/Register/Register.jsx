@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Box, Button, Stack, TextField, Container, Snackbar, Alert } from '@mui/material'
+import { Box, Button, Stack, TextField, Container, Snackbar, Alert, CircularProgress } from '@mui/material'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../../../../firebase'
 import loginImage from '../../../assets/img/loginImage.jpg'
@@ -14,14 +14,18 @@ function Register() {
   const [repeatPassword, setRepeatPassword] = useState('')
   const [showAlert, setShowAlert] = useState(false)
   const [showAlertFail, setShowAlertFail] = useState(false)
+  const [loading, setLoading] = useState(false)
+
   const onFinish = () => {
     if (!validateEmail(email) && password !== repeatPassword) {
       setShowAlertFail(true)
     }
     else {
+      setLoading(true)
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           localStorage.setItem('userId', userCredential.user.uid)
+          localStorage.setItem('email', userCredential.user.email)
           setShowAlert(true)
           setTimeout(() => {
             navigate('/home')
@@ -30,6 +34,9 @@ function Register() {
         .catch((error) => {
           console.log(error)
           setShowAlertFail(true)
+        })
+        .finally(() => {
+          setLoading(false)
         })
       setShowAlert(true)
     }
@@ -43,6 +50,14 @@ function Register() {
         position: 'relative',
         bgcolor: 'black'
       }}>
+        {loading && (
+          <Box sx={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999
+          }}>
+            <CircularProgress color="primary" />
+          </Box>
+        )}
         <img src={loginImage} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
         <Box sx={{
           position: 'absolute',
@@ -91,7 +106,7 @@ function Register() {
               error={password !== repeatPassword}
               helperText={password !== repeatPassword ? 'Password không trùng khớp' : ''}
             />
-            <Button sx={{ bgcolor: 'red', borderRadius: '5px', color: 'white', fontWeight: 'bold', ':hover': { bgcolor: 'brown' } }}
+            <Button sx={{ bgcolor: 'red', borderRadius: '5px', color: 'white', fontWeight: 'bold', ':hover': { bgcolor: '#FF6A6A' } }}
               onClick={onFinish}>Đăng ký
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

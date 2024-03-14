@@ -64,7 +64,7 @@ function ResetPassword() {
               onChange={e => setEmail(e.target.value)}
             />
             <Button
-              sx={{ bgcolor: 'red', color: 'white', fontWeight: 'bold', ':hover':{ bgcolor:'red' } }}
+              sx={{ bgcolor: 'red', color: 'white', fontWeight: 'bold', ':hover':{ bgcolor:'#FF6A6A' } }}
               onClick={() => onFinish()}
             >Get New Password From Email</Button>
           </Stack>

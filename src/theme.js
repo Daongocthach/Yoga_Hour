@@ -2,16 +2,17 @@ import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
 import { cyan, teal, deepOrange, orange } from '@mui/material/colors'
 
 const APP_BAR_HEIGHT = '70px'
-const BOARD_CONTENT_HEIGHT = '600px'
 const BOARD_BAR_HEIGHT = '51px'
-const PROMOTION_BANNER_HEIGHT = '650px'
+const FOOTER_HEIGHT= '180px'
+const BOARD_CONTENT_HEIGHT = `calc(100vh - ${APP_BAR_HEIGHT} - ${BOARD_BAR_HEIGHT})`
+
 
 const theme = extendTheme({
   webCustom: {
     appBarHeight: APP_BAR_HEIGHT,
     boardContentHeight: BOARD_CONTENT_HEIGHT,
     boardBarHeight: BOARD_BAR_HEIGHT,
-    promotionBannerHeight: PROMOTION_BANNER_HEIGHT
+    footerHeight: FOOTER_HEIGHT,
   },
   colors: {
     primary: teal,

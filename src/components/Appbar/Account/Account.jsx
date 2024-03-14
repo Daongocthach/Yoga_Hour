@@ -1,20 +1,27 @@
 import { useState } from 'react'
-import { Menu, Box, MenuItem, IconButton, Tooltip, Snackbar, Alert } from '@mui/material'
-import { Settings, PersonAdd, ManageAccounts } from '@mui/icons-material'
-import { Link, useNavigate } from 'react-router-dom'
+import { Menu, Box, MenuItem, IconButton, Tooltip, Snackbar, Alert, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
+import { Settings, Logout, ManageAccounts } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 import { signOut } from 'firebase/auth'
-import { child, get, ref, set } from 'firebase/database'
+import { child, ref, set } from 'firebase/database'
 import { database } from '../../../../firebase'
 import { auth } from '../../../../firebase'
 
 function Account() {
     const navigate = useNavigate()
+    const d = new Date()
+    const currentYear = d.getFullYear()
+    const currentMonth = d.getMonth() + 1
     const [anchorEl, setAnchorEl] = useState(null)
     const userId = localStorage.getItem('userId')
+    const email = localStorage.getItem('email')
     const dbRef = ref(database)
     const [showAlert, setShowAlert] = useState(false)
     const [showAlertFail, setShowAlertFail] = useState(false)
     const open = Boolean(anchorEl)
+    const [openDialogLogout, setOpenDialogLogout] = useState(false)
+    const [openDialogReset, setOpenDialogReset] = useState(false)
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget)
     }
@@ -23,8 +30,9 @@ function Account() {
     }
     const handleLogout = () => {
         signOut(auth).then(() => {
-            localStorage.removeItem('userId')
             setShowAlert(true)
+            localStorage.removeItem('email')
+            localStorage.removeItem('userId')
             setTimeout(() => {
                 navigate('/')
             }, 1000)
@@ -34,12 +42,23 @@ function Account() {
 
             ])
     }
+    const handleClickReset = () => {
+        setOpenDialogReset(true)
+        handleClose()
+    }
+    const handleClickLogout = () => {
+        setOpenDialogLogout(true)
+        handleClose()
+    }
     const handleReset = () => {
-        set(child(dbRef, `users/${userId}/hour`), {
+        set(child(dbRef, `users/${userId}/years/${currentYear}/${currentMonth}`), {
             time: 0
         })
         set(child(dbRef, `users/${userId}/total`), {
             time: 0
+        })
+        set(child(dbRef, `users/${userId}/targetName`), {
+            name: 'Dạy Yoga'
         })
         window.location.reload()
     }
@@ -66,19 +85,16 @@ function Account() {
                     'aria-labelledby': 'basic-button'
                 }}
             >
-                {!userId && <MenuItem onClick={handleClose}>
-                    <Link to={'/'} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <PersonAdd fontSize="small" />
-                        Đăng nhập
-                    </Link>
+                {email && <MenuItem sx={{ color: '#4F4F4F' }}>
+                    <b>{email}</b>
                 </MenuItem>}
-                {userId && <MenuItem onClick={handleReset}>
+                {userId && <MenuItem onClick={handleClickReset} sx={{ gap: 2, color: '#4F4F4F' }}>
                     <Settings fontSize="small" />
-                    Đặt lại
+                    <b>Xóa dữ liệu</b>
                 </MenuItem>}
-                {userId && <MenuItem onClick={handleLogout}>
-                    <Settings fontSize="small" />
-                    Đăng xuất
+                {userId && <MenuItem onClick={handleClickLogout} sx={{ gap: 2, color: '#4F4F4F' }}>
+                    <Logout fontSize="small" />
+                    <b>Đăng xuất</b>
                 </MenuItem>}
             </Menu>
             <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -93,6 +109,27 @@ function Account() {
                     Đăng xuất thất bại
                 </Alert>
             </Snackbar>
+            <Dialog open={openDialogLogout} keepMounted onClose={() => {setOpenDialogLogout(false)}} >
+                <DialogTitle>Bạn có muốn đăng xuất</DialogTitle>
+                <DialogContent>
+                    Nhấn "Ok" để đăng xuất, "Hủy" để thoát.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {setOpenDialogLogout(false)}} sx={{ fontWeight: 'bold', color:'gray' }}>Hủy</Button>
+                    <Button onClick={handleLogout} sx={{ fontWeight: 'bold' }}>Ok</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={openDialogReset} keepMounted onClose={() => {setOpenDialogReset(false)}} >
+                <DialogTitle>Bạn có muốn xóa toàn bộ dữ liệu</DialogTitle>
+                <DialogContent>
+                    Toàn bộ dữ liệu của bạn sẽ được đặt lại.
+                    Nhấn "Ok" để xóa dữ liệu, "Hủy" để thoát.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {setOpenDialogReset(false)}} sx={{ fontWeight: 'bold', color:'gray' }}>Hủy</Button>
+                    <Button onClick={handleReset} sx={{ fontWeight: 'bold' }}>Ok</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     )
 }
