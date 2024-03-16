@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert, Snackbar, Typography, Box } from '@mui/material'
 import EditIcon from '@mui/icons-material/DriveFileRenameOutline'
 
-function AddHour({ updateYogaTimeInFirebase, updateTotalInFirebase, time, setTime, total, setTotal }) {
+function AddHour({ updateYogaTimeInFirebase, updateTotalInFirebase, updateTimeDateInFirebase, time, setTime, total, setTotal, timeOfDate, setTimeOfDate }) {
     const [open, setOpen] = useState(false)
     const [hour, setHour] = useState(0)
     const [showAlert, setShowAlert] = useState(false)
@@ -14,7 +14,7 @@ function AddHour({ updateYogaTimeInFirebase, updateTotalInFirebase, time, setTim
     const handleClose = () => {
         setOpen(false)
     }
-    const handleClickAdd = () => {
+    const handleClickAdd = async () => {
         const newHour = parseInt(hour)
         updateYogaTimeInFirebase(newHour)
         setTime(newHour)
@@ -22,23 +22,35 @@ function AddHour({ updateYogaTimeInFirebase, updateTotalInFirebase, time, setTim
             const newTotal = total + (newHour - time)
             setTotal(newTotal)
             updateTotalInFirebase(newTotal)
+
+            const newTimeOfDate = timeOfDate + (newHour - time)
+            setTimeOfDate(newTimeOfDate)
+            updateTimeDateInFirebase(newTimeOfDate)
         } else {
             let newTotal = total - (time - newHour)
             if (newTotal < 0)
                 newTotal = 0
             setTotal(newTotal)
             updateTotalInFirebase(newTotal)
+            let newTimeOfDate = timeOfDate - (time - newHour)
+            if (newTimeOfDate < 0)
+                newTimeOfDate = 0
+            setTimeOfDate(newTimeOfDate)
+            updateTimeDateInFirebase(newTimeOfDate)
         }
         handleClose()
     }
     return (
-        <Box sx={{ display:'flex', flexDirection:'column', pt: 4 }}>
-            <Button endIcon={<EditIcon sx={{ fontSize: '30px', color: 'white' }} />} sx={{ bgcolor: 'inherit', fontSize: '18px', fontWeight: 'bold', color: '#696969', flex: 1 }}
-                onClick={handleClickOpen}>
-                <Typography variant='h4' sx={{ color: 'white', fontWeight: 'bold' }}>{time}</Typography>
-            </Button>
-            <Typography variant='subtitle1' sx={{ color: 'white', fontWeight: 'bold', textAlign:'center' }}>Hôm nay</Typography>
-            <Typography variant='body2' sx={{ color: 'white', fontWeight: 'bold', textAlign:'center' }}>+8 giờ</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', mt: 6 }}>
+                <Button endIcon={<EditIcon sx={{ fontSize: '30px', color: 'white' }} />} sx={{ fontWeight: 'bold', color: '#696969', height: 40 }}
+                    onClick={handleClickOpen}>
+                    <Typography variant='h3' sx={{ color: 'white', fontWeight: 'bold', fontFamily: '"Crimson Text", serif' }}>{time}</Typography>
+                </Button>
+                <Typography variant='body2' sx={{ color: '#FFE500', fontWeight: 500, textAlign: 'center', fontFamily: '"Crimson Text", serif', height: 15 }}>Hôm nay:</Typography>
+                <Typography variant='h6' sx={{ color: '#FFE500', fontWeight: 700, textAlign: 'center', fontFamily: '"Crimson Text", serif', height: 25 }}>+ {timeOfDate} </Typography>
+                <Typography variant='body2' sx={{ color: '#FFE500', fontWeight: 500, textAlign: 'center', fontFamily: '"Crimson Text", serif' }}>Giờ</Typography>
+            </Box>
             <Dialog open={open} onClose={handleClose} >
                 <DialogTitle sx={{ color: '#4F4F4F', fontWeight: 'bold' }} >Nhập giờ dạy trong tháng</DialogTitle>
                 <DialogContent >

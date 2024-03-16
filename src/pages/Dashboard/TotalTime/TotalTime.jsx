@@ -8,13 +8,13 @@ function TotalTime({ progress }) {
                 <div className="circle">
                     <div className="wave" style={{ '--progress': (44 - progress) + '%' }}></div>
                 </div>
-                <Typography variant='h4'
-                    sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2, color: 'white', fontWeight: 'bold' }}>
+                <Typography variant='h3'
+                    sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2, color: 'white', fontWeight: 'bold', fontFamily: '"Crimson Text", serif' }}>
                     {(progress * 100).toFixed(0)}
                 </Typography>
             </Box>
             <Typography
-                sx={{ color: 'gray', textAlign: 'center', mt: 1, fontWeight: 'bold', fontSize: '18px' }}>Tổng thời gian</Typography>
+                sx={{ color: 'gray', textAlign: 'center', mt: 1, fontWeight: 'bold', fontSize: '18px', fontFamily: '"Crimson Text", serif' }}>Tổng thời gian</Typography>
         </Box>
     )
 }

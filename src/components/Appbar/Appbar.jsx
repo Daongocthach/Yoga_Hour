@@ -12,10 +12,10 @@ function AppBar() {
       bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#1C1C1C' : '#1874CD')
     }} paddingX={{ xs: 0, md: 5 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Link to={'/home'} style={{ textDecoration: 'none' }}><img src={ReadBookLogo} style={{ height: '50px', width: '50px' }} /> </Link>
+        <Link to={'/home'} style={{ textDecoration: 'none' }}><img src={ReadBookLogo} style={{ height: '50px', width: '50px' }} /></Link>
         <Typography variant="h5" fontWeight="bold" color={'#E8E8E8'} >Target Hours</Typography>
       </Box>
-      <Box sx={{ alignItems: 'center', gap: 2, paddingX: 2 }}>
+      <Box sx={{ alignItems: 'center', paddingX: 2, display:'flex' }}>
         <Account/>
       </Box>
     </Box>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Container, TextField, Stack, Button, Box, Alert, Snackbar, CircularProgress } from '@mui/material'
 import GoogleIcon from '@mui/icons-material/Google'
 import { Link, useNavigate } from 'react-router-dom'
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { signInWithEmailAndPassword, signInWithPopup, onAuthStateChanged, signInWithRedirect } from 'firebase/auth'
 import { auth, provider } from '../../../../firebase'
 import loginImage from '../../../assets/img/loginImage.jpg'
 import { validateEmail } from '../../../utils/email'
@@ -16,47 +16,42 @@ function Login() {
   const [showAlertFail, setShowAlertFail] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const onSignIn = () => {
+  const onSignIn = async () => {
     if (email && password !== '') {
-      setLoading(true)
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          localStorage.setItem('userId', userCredential.user.uid)
-          localStorage.setItem('email', userCredential.user.email)
-          setShowAlert(true)
-          setTimeout(() => {
-            navigate('/home')
-          }, 1000)
-        })
-        .catch((error) => {
-          console.log(error)
-          setShowAlertFail(true)
-        })
-        .finally(() => {
-          setLoading(false)
-        })
+      try {
+        await signInWithRedirect(auth, provider)
+      } catch (error) {
+        console.log(error)
+        setShowAlertFail(true)
+      }
     }
   }
   const onLoginGoogle = async () => {
     setLoading(true)
-    signInWithPopup(auth, provider)
-      .then((userCredential) => {
-        localStorage.setItem('userId', userCredential.user.uid)
-        localStorage.setItem('email', userCredential.user.email)
-        setShowAlert(true)
-        setTimeout(() => {
-          navigate('/home')
-        }, 1000)
-      })
-      .catch((error) => {
-        console.log(error)
-        setShowAlertFail(true)
-      })
+    try {
+      await signInWithRedirect(auth, provider)
+    } catch (error) {
+      console.log(error)
+      setShowAlertFail(true)
+    }
     setLoading(false)
   }
   useEffect(() => {
     if (userId)
       navigate('/home')
+    else {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          localStorage.setItem('userId', user.uid)
+          localStorage.setItem('email', user.email)
+          setShowAlert(true)
+          setTimeout(() => {
+            navigate('/home')
+          }, 1000)
+        }
+      })
+      return () => unsubscribe()
+    }
   }, [])
   return (
     <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>

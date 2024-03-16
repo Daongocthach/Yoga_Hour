@@ -19,6 +19,7 @@ function Dashboard({ dbRef, userId }) {
   const [loading, setLoading] = useState(false)
   const [years, setYears] = useState([])
   const [time, setTime] = useState(0)
+  const [timeOfDate, setTimeOfDate] = useState(0)
   const [total, setTotal] = useState(0)
   const [isPayed, setIsPayed] = useState(false)
   const [targetName, setTargetName] = useState('')
@@ -30,6 +31,7 @@ function Dashboard({ dbRef, userId }) {
     }
     setShowAlert(false)
   }
+
   const updateYogaTimeInFirebase = (time) => {
     set(child(dbRef, `users/${userId}/years/${currentYear}/${currentMonth}`), {
       time: time
@@ -37,6 +39,12 @@ function Dashboard({ dbRef, userId }) {
   }
   const updateTotalInFirebase = (time) => {
     set(child(dbRef, `users/${userId}/total`), {
+      time: time
+    })
+  }
+  const updateTimeDateInFirebase = (time) => {
+    set(child(dbRef, `users/${userId}/date`), {
+      currentDay: currentDay,
       time: time
     })
   }
@@ -49,6 +57,9 @@ function Dashboard({ dbRef, userId }) {
     const newTotal = total + 1
     setTotal(newTotal)
     updateTotalInFirebase(newTotal)
+    const newTimeOfDate = timeOfDate + 1
+    setTimeOfDate(newTimeOfDate)
+    updateTimeDateInFirebase(newTimeOfDate)
     const newProgress = progress + 0.01
     progress = newProgress > 100 ? 100 : newProgress
   }
@@ -61,6 +72,9 @@ function Dashboard({ dbRef, userId }) {
       const newTotal = total - 1
       setTotal(newTotal < 0 ? 0 : newTotal)
       updateTotalInFirebase(newTotal)
+      const newTimeOfDate = timeOfDate - 1
+      setTimeOfDate(newTimeOfDate < 0 ? 0 : newTimeOfDate)
+      updateTotalInFirebase(newTimeOfDate)
       const newProgress = progress - 0.01
       progress = newProgress > 100 ? 100 : newProgress
     }
@@ -85,11 +99,23 @@ function Dashboard({ dbRef, userId }) {
     }).catch((error) => {
       console.error(error)
     })
-    get(child(dbRef, `users/${userId}/isPayed`)).then((snapshot) => {
+    // get(child(dbRef, `users/${userId}/isPayed`)).then((snapshot) => {
+    //   if (snapshot.exists()) {
+    //     setIsPayed(snapshot.val())
+    //   } else {
+    //     setIsPayed(0)
+    //   }
+    // }).catch((error) => {
+    //   console.error(error)
+    // })
+    get(child(dbRef, `users/${userId}/date`)).then((snapshot) => {
       if (snapshot.exists()) {
-        setIsPayed(snapshot.val())
+        if (snapshot.val().currentDay == currentDay)
+          setTimeOfDate(snapshot.val().time)
+        else
+          setTimeOfDate(0)
       } else {
-        setIsPayed(0)
+        setTimeOfDate(0)
       }
     }).catch((error) => {
       console.error(error)
@@ -146,11 +172,11 @@ function Dashboard({ dbRef, userId }) {
                 width: '160px', height: '160px', backgroundColor: '#1874CD', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center', borderRadius: 100, boxShadow: '0 0 0 2px #00B2EE'
               }} >
-                <AddHour time={time} total={total}
+                <AddHour time={time} total={total} timeOfDate={timeOfDate} updateTimeDateInFirebase={updateTimeDateInFirebase}
                   updateYogaTimeInFirebase={updateYogaTimeInFirebase} updateTotalInFirebase={updateTotalInFirebase}
-                  setTime={setTime} setTotal={setTotal} />
+                  setTime={setTime} setTotal={setTotal} setTimeOfDate={setTimeOfDate} />
               </Box>
-              <Typography sx={{ color: 'gray', textAlign: 'center', mt: 1, fontWeight: 'bold', fontSize: '18px' }} lineHeight={1}>
+              <Typography sx={{ color: 'gray', textAlign: 'center', mt: 1, fontWeight: 'bold', fontSize: '18px', fontFamily: '"Crimson Text", serif' }} lineHeight={1}>
                 Thời gian dạy tháng {currentMonth}</Typography>
             </Box>
             {/* Total Time */}
@@ -159,16 +185,16 @@ function Dashboard({ dbRef, userId }) {
           {/* Add and subtract*/}
           <Box sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2, display: 'flex', width: '100%' }} >
             <Button onClick={handleSubtractTime}
-              sx={{ backgroundColor: '#1C86EE', color: 'white', ':hover': { backgroundColor: '#1874CD' }, width: { xs: 'auto', md: 100 }, fontWeight: 'bold' }}>
+              sx={{ backgroundColor: '#1C86EE', color: 'white', ':hover': { backgroundColor: '#1874CD' }, width: { xs: 'auto', md: 100 }, fontWeight: 'bold', fontFamily: '"Crimson Text", serif' }}>
               -   1 giờ
             </Button>
             <Button onClick={handleAddTime}
-              sx={{ backgroundColor: '#1C86EE', color: 'white', ':hover': { backgroundColor: '#1874CD' }, width: { xs: 'auto', md: 100 }, fontWeight: 'bold' }}>
+              sx={{ backgroundColor: '#1C86EE', color: 'white', ':hover': { backgroundColor: '#1874CD' }, width: { xs: 'auto', md: 100 }, fontWeight: 'bold', fontFamily: '"Crimson Text", serif' }}>
               +   1 Giờ
             </Button>
           </Box>
           <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', pt: 3 }}>
-            <Typography sx={{ color: 'gray', textAlign: 'center', fontFamily: 'Merriweather", serif' }} variant='h6' fontSize={{ xs: '14px', sm: '16px', md: '18px' }}>
+            <Typography sx={{ color: 'gray', textAlign: 'center', fontFamily: '"Crimson Text", serif', fontWeight: 'bold' }} fontSize={{ xs: '16px', sm: '18px', md: '20px' }}>
               <i>"Tôi không sợ người luyện tập 10.000 cú đá chỉ một lần,<br />mà chỉ sợ người thực hành một cú đá 10.000 lần"</i>
             </Typography>
           </Box>

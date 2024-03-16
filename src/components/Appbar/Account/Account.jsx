@@ -60,6 +60,9 @@ function Account() {
         set(child(dbRef, `users/${userId}/targetName`), {
             name: 'Dạy Yoga'
         })
+        set(child(dbRef, `users/${userId}/date`), {
+            time: 0
+        })
         window.location.reload()
     }
     return (
